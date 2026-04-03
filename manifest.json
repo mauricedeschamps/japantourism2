@@ -2,7 +2,7 @@
   "name": "Japan Traveler's Picks",
   "short_name": "J-Travel",
   "description": "おすすめの日本旅行サービス",
-  "start_url": "index.html",
+  "start_url": ".index/html",
   "scope": "./",
   "display": "standalone",
   "theme_color": "#1e1e2f",
