@@ -86,11 +86,6 @@
       color: white;
       border-color: var(--primary);
     }
-    #installBtn {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
     .sponsor-area {
       background: var(--surface);
       border-radius: 24px;
@@ -98,6 +93,25 @@
       margin: 1.5rem 0;
       text-align: center;
       border: 1px dashed var(--border);
+    }
+    .sponsor-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-secondary);
+      margin-bottom: 0.8rem;
+    }
+    .sponsor-flex {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    .sponsor-item img {
+      max-height: 60px;
+      width: auto;
+      border-radius: 12px;
     }
     .service-grid {
       display: grid;
@@ -178,15 +192,13 @@
     .hidden {
       display: none;
     }
-    .debug-box {
-      background: rgba(255,0,0,0.1);
-      border-left: 4px solid var(--primary);
-      padding: 0.5rem;
-      margin: 1rem 0;
-      font-size: 0.8rem;
+    .note-code {
       font-family: monospace;
-      white-space: pre-wrap;
-      word-break: break-all;
+      font-size: 0.7rem;
+      background: var(--surface-light);
+      padding: 0.2rem 0.4rem;
+      border-radius: 8px;
+      margin-top: 0.5rem;
     }
   </style>
 </head>
@@ -195,16 +207,12 @@
   <div class="header">
     <h1 data-en="Japan Traveler's Picks" data-ja="日本の旅おすすめサービス">Japan Traveler's Picks</h1>
     <div class="controls">
-      <button id="installBtn">📲 インストール</button>
       <button id="langBtn">日本語</button>
       <button id="themeBtn">☀️ ライト</button>
     </div>
   </div>
 
   <div id="topSponsor" class="sponsor-area"></div>
-
-  <!-- デバッグ情報表示エリア（インストール問題解決用） -->
-  <div id="debugInfo" class="debug-box" style="display: none;"></div>
 
   <div id="listView">
     <div id="serviceList" class="service-grid"></div>
@@ -230,7 +238,7 @@
 
 <script>
   // --------------------------------------------------------------
-  // サービスデータ（前回と同じ）
+  // サービスデータ
   // --------------------------------------------------------------
   const services = [
     { id: 1, name_en: "JNTO / Travel Japan", name_ja: "JNTO / 日本政府観光局", desc_en: "Official Japan National Tourism Organization site. Reliable travel guides, events, multi-language support.", desc_ja: "日本政府観光局公式サイト。多言語対応の信頼できる旅行ガイド、イベント情報。", imageUrl: "https://placehold.co/600x400/FF7B2C/white?text=JNTO", officialUrl: "https://www.japan.travel/en/" },
@@ -243,7 +251,7 @@
     { id: 8, name_en: "Matcha", name_ja: "Matcha", desc_en: "Web magazine for inbound tourists featuring culture, sightseeing, and experiences.", desc_ja: "訪日外国人向けに文化・観光・体験情報を発信するWebメディア。", imageUrl: "https://placehold.co/600x400/66BB6A/white?text=Matcha", officialUrl: "https://matcha-jp.com/en/" }
   ];
 
-  // スポンサー
+  // スポンサーデータ（自由に追加）
   let sponsors = [
     { imageUrl: "https://www.google.co.jp/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png", linkUrl: "https://www.google.com/", alt: "Google" },
     { imageUrl: "https://localo.com/assets/img/definitions/what-is-google-translate.webp", linkUrl: "https://translate.google.co.jp/", alt: "Google Translate" }
@@ -251,8 +259,6 @@
 
   let currentLang = "en";
   let currentTheme = "dark";
-  let deferredPrompt = null;
-  let installButton = document.getElementById('installBtn');
 
   // DOM 要素
   const listView = document.getElementById('listView');
@@ -267,94 +273,42 @@
   const themeBtn = document.getElementById('themeBtn');
   const topSponsorDiv = document.getElementById('topSponsor');
   const bottomSponsorDiv = document.getElementById('bottomSponsor');
-  const debugDiv = document.getElementById('debugInfo');
-
-  function logDebug(msg, isError = false) {
-    debugDiv.style.display = 'block';
-    debugDiv.innerHTML += `[${new Date().toLocaleTimeString()}] ${msg}<br>`;
-    if (isError) console.error(msg);
-    else console.log(msg);
-  }
 
   // --------------------------------------------------------------
-  // PWA インストール処理（改良版）
+  // インストールプロンプトを完全に抑制
   // --------------------------------------------------------------
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
-    deferredPrompt = e;
-    installButton.style.display = 'inline-block';
-    logDebug('✅ beforeinstallprompt イベントを受信しました。インストール可能です。');
-  });
-
-  window.addEventListener('appinstalled', () => {
-    installButton.style.display = 'none';
-    deferredPrompt = null;
-    logDebug('🎉 アプリが正常にインストールされました！');
-  });
-
-  installButton.addEventListener('click', async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        logDebug('ユーザーがインストールを承認しました。');
-        installButton.style.display = 'none';
-      } else {
-        logDebug('ユーザーがインストールを拒否しました。');
-      }
-      deferredPrompt = null;
-    } else {
-      // 代替案：手動インストールの案内を表示
-      logDebug('⚠️ 自動インストールプロンプトが利用できません。', true);
-      alert('インストールプロンプトを表示できませんでした。\n\n代わりに、ブラウザのメニュー（Chrome: 右上の三点リーダー →「アプリをインストール」）から手動でインストールしてください。\n\nまたは、以下の条件を確認してください：\n・HTTPSでアクセスしているか\n・マニフェストが正しく読み込まれているか\n・サービスワーカーが登録されているか');
-    }
+    // 何も表示しない
+    console.log('PWA installation prompt suppressed');
   });
 
   // --------------------------------------------------------------
-  // サービスワーカー登録（強制更新＆デバッグ）
+  // Service Worker 登録（オフラインキャッシュ用、インストールとは無関係）
   // --------------------------------------------------------------
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js', { scope: './' })
-        .then(reg => {
-          logDebug(`✅ Service Worker 登録成功: ${reg.scope}`);
-          // 更新チェック
-          reg.update();
-          // コントロールを即座に取得
-          if (reg.installing) {
-            reg.installing.addEventListener('statechange', (e) => {
-              logDebug(`SW 状態: ${e.target.state}`);
-            });
-          }
-        })
-        .catch(err => {
-          logDebug(`❌ Service Worker 登録失敗: ${err}`, true);
-        });
+        .then(reg => console.log('Service Worker registered:', reg.scope))
+        .catch(err => console.error('SW registration failed:', err));
     });
-  } else {
-    logDebug('❌ このブラウザは Service Worker をサポートしていません。PWA としてインストールできません。', true);
   }
 
-  // マニフェストが正しく読み込まれているか確認（リンクタグから）
-  fetch('manifest.json')
-    .then(res => res.ok ? logDebug('✅ manifest.json の読み込みに成功') : logDebug('⚠️ manifest.json の読み込みに失敗', true))
-    .catch(err => logDebug(`❌ manifest.json エラー: ${err}`, true));
-
   // --------------------------------------------------------------
-  // レンダリング関数（前回と同様）
+  // レンダリング関数
   // --------------------------------------------------------------
   function renderSponsors() {
     const renderBlock = (container) => {
       if (!container) return;
       if (!sponsors.length) {
-        container.innerHTML = `<div class="sponsor-title">✨ SPONSOR ✨</div><div class="note-code">[ Add sponsors in JS array ]</div>`;
+        container.innerHTML = `<div class="sponsor-title">✨ SPONSOR ✨</div><div class="note-code">[ Add sponsors in JS array ]</div><div class="note-code">スポンサー募集中！</div>`;
         return;
       }
-      let html = `<div class="sponsor-title">✨ SPONSOR ✨</div><div class="sponsor-flex" style="display:flex; flex-wrap:wrap; justify-content:center; gap:1.5rem;">`;
+      let html = `<div class="sponsor-title">✨ SPONSOR ✨</div><div class="sponsor-flex">`;
       sponsors.forEach(sp => {
-        html += `<div class="sponsor-item"><a href="${sp.linkUrl}" target="_blank" rel="sponsored"><img src="${sp.imageUrl}" alt="${sp.alt}" style="max-height:60px; border-radius:12px;"></a></div>`;
+        html += `<div class="sponsor-item"><a href="${sp.linkUrl}" target="_blank" rel="sponsored"><img src="${sp.imageUrl}" alt="${sp.alt}" loading="lazy"></a></div>`;
       });
-      html += `</div><div class="note-code" style="margin-top:0.5rem;">💡 Seeking sponsors</div>`;
+      html += `</div><div class="note-code">💡 Seeking sponsors スポンサー募集中！</div>`;
       container.innerHTML = html;
     };
     renderBlock(topSponsorDiv);
@@ -508,9 +462,6 @@
         backToList();
       }
     });
-
-    // インストールボタンを常に表示（ただし機能は前述の通り）
-    installButton.style.display = 'inline-block';
   }
 
   init();
