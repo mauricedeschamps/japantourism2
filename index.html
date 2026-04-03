@@ -251,7 +251,7 @@
     { id: 8, name_en: "Matcha", name_ja: "Matcha", desc_en: "Web magazine for inbound tourists featuring culture, sightseeing, and experiences.", desc_ja: "訪日外国人向けに文化・観光・体験情報を発信するWebメディア。", imageUrl: "https://placehold.co/600x400/66BB6A/white?text=Matcha", officialUrl: "https://matcha-jp.com/en/" }
   ];
 
-  // スポンサーデータ（自由に追加）
+  // スポンサーデータ（自由に追加・変更可能）
   let sponsors = [
     { imageUrl: "https://www.google.co.jp/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png", linkUrl: "https://www.google.com/", alt: "Google" },
     { imageUrl: "https://localo.com/assets/img/definitions/what-is-google-translate.webp", linkUrl: "https://translate.google.co.jp/", alt: "Google Translate" }
@@ -275,16 +275,14 @@
   const bottomSponsorDiv = document.getElementById('bottomSponsor');
 
   // --------------------------------------------------------------
-  // インストールプロンプトを完全に抑制
+  // PWA インストール：デフォルトのプロンプトを許可（何もしない）
   // --------------------------------------------------------------
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    // 何も表示しない
-    console.log('PWA installation prompt suppressed');
-  });
+  // beforeinstallprompt イベントをそのままにし、preventDefault を呼ばない
+  // ブラウザ標準のインストールプロンプトが自動表示される
+  // 独自のインストールUIは表示しない
 
   // --------------------------------------------------------------
-  // Service Worker 登録（オフラインキャッシュ用、インストールとは無関係）
+  // Service Worker 登録（オフラインキャッシュ用）
   // --------------------------------------------------------------
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
