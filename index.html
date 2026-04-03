@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Japan Traveler's Picks</title>
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#1e1e2f">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -189,6 +189,10 @@
       font-size: 0.85rem;
       color: var(--text-secondary);
     }
+    .footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
     .hidden {
       display: none;
     }
@@ -199,6 +203,14 @@
       padding: 0.2rem 0.4rem;
       border-radius: 8px;
       margin-top: 0.5rem;
+    }
+    .install-link {
+      display: inline-block;
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      color: var(--primary);
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -231,8 +243,10 @@
   <div id="bottomSponsor" class="sponsor-area"></div>
 
   <div class="footer">
-    Contact us<br>
-    <a href="mailto:mementomorikatsu@gmail.com">mementomorikatsu@gmail.com</a>
+    <div>Contact us: <a href="mailto:mementomorikatsu@gmail.com">mementomorikatsu@gmail.com</a></div>
+    <div id="installContainer" style="margin-top: 0.8rem;">
+      <span id="installLink" class="install-link" style="display: none;">📲 アプリをインストール</span>
+    </div>
   </div>
 </div>
 
@@ -251,7 +265,7 @@
     { id: 8, name_en: "Matcha", name_ja: "Matcha", desc_en: "Web magazine for inbound tourists featuring culture, sightseeing, and experiences.", desc_ja: "訪日外国人向けに文化・観光・体験情報を発信するWebメディア。", imageUrl: "https://placehold.co/600x400/66BB6A/white?text=Matcha", officialUrl: "https://matcha-jp.com/en/" }
   ];
 
-  // スポンサーデータ（自由に追加・変更可能）
+  // スポンサーデータ（自由に追加）
   let sponsors = [
     { imageUrl: "https://www.google.co.jp/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png", linkUrl: "https://www.google.com/", alt: "Google" },
     { imageUrl: "https://localo.com/assets/img/definitions/what-is-google-translate.webp", linkUrl: "https://translate.google.co.jp/", alt: "Google Translate" }
@@ -259,6 +273,8 @@
 
   let currentLang = "en";
   let currentTheme = "dark";
+  let deferredPrompt = null;
+  const installLink = document.getElementById('installLink');
 
   // DOM 要素
   const listView = document.getElementById('listView');
@@ -275,18 +291,44 @@
   const bottomSponsorDiv = document.getElementById('bottomSponsor');
 
   // --------------------------------------------------------------
-  // PWA インストール：デフォルトのプロンプトを許可（何もしない）
+  // PWA インストール処理（ユーザークリックでプロンプト表示）
   // --------------------------------------------------------------
-  // beforeinstallprompt イベントをそのままにし、preventDefault を呼ばない
-  // ブラウザ標準のインストールプロンプトが自動表示される
-  // 独自のインストールUIは表示しない
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installLink.style.display = 'inline-block';
+    console.log('beforeinstallprompt キャプチャしました');
+  });
+
+  installLink.addEventListener('click', async () => {
+    if (!deferredPrompt) {
+      console.log('deferredPrompt がありません。');
+      // フォールバック: ブラウザの手動インストールを案内
+      alert('インストールプロンプトを表示できませんでした。\n代わりに、ブラウザのメニューから「アプリをインストール」をお試しください。');
+      return;
+    }
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      console.log('ユーザーがインストールを承認しました');
+      installLink.style.display = 'none';
+    } else {
+      console.log('ユーザーがインストールを拒否しました');
+    }
+    deferredPrompt = null;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    console.log('アプリがインストールされました');
+    installLink.style.display = 'none';
+  });
 
   // --------------------------------------------------------------
   // Service Worker 登録（オフラインキャッシュ用）
   // --------------------------------------------------------------
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js', { scope: './' })
+      navigator.serviceWorker.register('./sw.js', { scope: './' })
         .then(reg => console.log('Service Worker registered:', reg.scope))
         .catch(err => console.error('SW registration failed:', err));
     });
