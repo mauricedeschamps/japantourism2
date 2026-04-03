@@ -1,12 +1,9 @@
-const CACHE_NAME = 'japan-travel-v2';  // バージョンを上げて確実に更新
+const CACHE_NAME = 'japan-travel-v3';
 const urlsToCache = [
   './',
   'index.html',
   'manifest.json',
-  'sw.js',
-  'icons/icon-192.jpg',
-  'icons/icon-512.jpg'
-  
+  'sw.js'
 ];
 
 self.addEventListener('install', event => {
@@ -23,7 +20,6 @@ self.addEventListener('fetch', event => {
       .then(response => {
         if (response) return response;
         return fetch(event.request).catch(() => {
-          // オフライン時に代替テキストを返す
           return new Response(
             '<html><body><h1>オフライン</h1><p>ネットワークに接続して再度お試しください。</p></body></html>',
             { headers: { 'Content-Type': 'text/html' } }
