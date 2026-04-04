@@ -8,6 +8,8 @@
   <meta name="theme-color" content="#1e1e2f">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icons/icon-192.jpg">
+  <meta name="apple-mobile-web-app-title" content="J-Travel">
   <style>
     * {
       margin: 0;
@@ -15,6 +17,7 @@
       box-sizing: border-box;
       transition: background 0.2s, color 0.2s, border-color 0.2s;
     }
+
     :root {
       --bg: #121212;
       --surface: #1e1e2f;
@@ -26,6 +29,7 @@
       --border: #3a3a4a;
       --card-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
+
     body.light {
       --bg: #f8f9fa;
       --surface: #ffffff;
@@ -37,17 +41,20 @@
       --border: #dee2e6;
       --card-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
+
     body {
       background-color: var(--bg);
       color: var(--text);
       font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       line-height: 1.5;
     }
+
     .app {
       max-width: 1200px;
       margin: 0 auto;
       padding: 1rem;
     }
+
     .header {
       display: flex;
       justify-content: space-between;
@@ -58,6 +65,7 @@
       padding-bottom: 1rem;
       border-bottom: 2px solid var(--primary);
     }
+
     h1 {
       font-size: 1.8rem;
       background: linear-gradient(135deg, var(--primary), #ffaa66);
@@ -65,12 +73,13 @@
       background-clip: text;
       color: transparent;
     }
+
     .controls {
       display: flex;
       gap: 0.8rem;
       align-items: center;
-      flex-wrap: wrap;
     }
+
     button {
       background: var(--surface-light);
       border: 1px solid var(--border);
@@ -81,11 +90,22 @@
       font-weight: 500;
       font-size: 0.9rem;
     }
+
     button:hover {
       background: var(--primary);
       color: white;
       border-color: var(--primary);
     }
+
+    #installBtn {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    #installBtn:hover {
+      background: var(--primary-dark);
+    }
+
     .sponsor-area {
       background: var(--surface);
       border-radius: 24px;
@@ -130,6 +150,7 @@
     }
     .card:hover {
       transform: translateY(-4px);
+      box-shadow: 0 12px 20px rgba(0,0,0,0.2);
     }
     .card-img {
       width: 100%;
@@ -167,6 +188,10 @@
       font-size: 1.8rem;
       margin-bottom: 1rem;
     }
+    .detail-desc {
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
     .official-link {
       display: inline-block;
       background: var(--primary);
@@ -175,6 +200,7 @@
       border-radius: 40px;
       text-decoration: none;
       font-weight: bold;
+      margin-top: 0.5rem;
     }
     .back-btn {
       background: var(--surface-light);
@@ -204,21 +230,14 @@
       border-radius: 8px;
       margin-top: 0.5rem;
     }
-    .install-link {
-      display: inline-block;
-      margin-top: 0.5rem;
-      font-size: 0.8rem;
-      cursor: pointer;
-      color: var(--primary);
-      text-decoration: underline;
-    }
   </style>
 </head>
-<body class="dark">
+<body>
 <div class="app">
   <div class="header">
     <h1 data-en="Japan Traveler's Picks" data-ja="日本の旅おすすめサービス">Japan Traveler's Picks</h1>
     <div class="controls">
+      <button id="installBtn" style="display: none;">📲 インストール</button>
       <button id="langBtn">日本語</button>
       <button id="themeBtn">☀️ ライト</button>
     </div>
@@ -243,10 +262,8 @@
   <div id="bottomSponsor" class="sponsor-area"></div>
 
   <div class="footer">
-    <div>Contact us: <a href="mailto:mementomorikatsu@gmail.com">mementomorikatsu@gmail.com</a></div>
-    <div id="installContainer" style="margin-top: 0.8rem;">
-      <span id="installLink" class="install-link" style="display: none;">📲 アプリをインストール</span>
-    </div>
+    Contact us<br>
+    <a href="mailto:mementomorikatsu@gmail.com">mementomorikatsu@gmail.com</a>
   </div>
 </div>
 
@@ -265,16 +282,15 @@
     { id: 8, name_en: "Matcha", name_ja: "Matcha", desc_en: "Web magazine for inbound tourists featuring culture, sightseeing, and experiences.", desc_ja: "訪日外国人向けに文化・観光・体験情報を発信するWebメディア。", imageUrl: "https://placehold.co/600x400/66BB6A/white?text=Matcha", officialUrl: "https://matcha-jp.com/en/" }
   ];
 
-  // スポンサーデータ（自由に追加）
+  // スポンサーデータ（自由に追加/変更可能）
   let sponsors = [
-    { imageUrl: "https://www.google.co.jp/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png", linkUrl: "https://www.google.com/", alt: "Google" },
-    { imageUrl: "https://localo.com/assets/img/definitions/what-is-google-translate.webp", linkUrl: "https://translate.google.co.jp/", alt: "Google Translate" }
+    { imageUrl: "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png", linkUrl: "https://www.google.com/", alt: "Google" },
+    { imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Google_Translate_icon.svg/1024px-Google_Translate_icon.svg.png", linkUrl: "https://translate.google.co.jp/", alt: "Google Translate" }
   ];
 
   let currentLang = "en";
   let currentTheme = "dark";
   let deferredPrompt = null;
-  const installLink = document.getElementById('installLink');
 
   // DOM 要素
   const listView = document.getElementById('listView');
@@ -287,52 +303,33 @@
   const detailLink = document.getElementById('detailLink');
   const langBtn = document.getElementById('langBtn');
   const themeBtn = document.getElementById('themeBtn');
+  const installBtn = document.getElementById('installBtn');
   const topSponsorDiv = document.getElementById('topSponsor');
   const bottomSponsorDiv = document.getElementById('bottomSponsor');
 
   // --------------------------------------------------------------
-  // PWA インストール処理（ユーザークリックでプロンプト表示）
+  // PWA インストール関連
   // --------------------------------------------------------------
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    installLink.style.display = 'inline-block';
-    console.log('beforeinstallprompt キャプチャしました');
+    installBtn.style.display = 'inline-block';
   });
 
-  installLink.addEventListener('click', async () => {
-    if (!deferredPrompt) {
-      console.log('deferredPrompt がありません。');
-      // フォールバック: ブラウザの手動インストールを案内
-      alert('インストールプロンプトを表示できませんでした。\n代わりに、ブラウザのメニューから「アプリをインストール」をお試しください。');
-      return;
-    }
+  installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
     if (outcome === 'accepted') {
-      console.log('ユーザーがインストールを承認しました');
-      installLink.style.display = 'none';
-    } else {
-      console.log('ユーザーがインストールを拒否しました');
+      installBtn.style.display = 'none';
     }
     deferredPrompt = null;
   });
 
   window.addEventListener('appinstalled', () => {
-    console.log('アプリがインストールされました');
-    installLink.style.display = 'none';
+    installBtn.style.display = 'none';
+    console.log('PWA installed');
   });
-
-  // --------------------------------------------------------------
-  // Service Worker 登録（オフラインキャッシュ用）
-  // --------------------------------------------------------------
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js', { scope: './' })
-        .then(reg => console.log('Service Worker registered:', reg.scope))
-        .catch(err => console.error('SW registration failed:', err));
-    });
-  }
 
   // --------------------------------------------------------------
   // レンダリング関数
@@ -341,10 +338,10 @@
     const renderBlock = (container) => {
       if (!container) return;
       if (!sponsors.length) {
-        container.innerHTML = `<div class="sponsor-title">✨ SPONSOR ✨</div><div class="note-code">[ Add sponsors in JS array ]</div><div class="note-code">スポンサー募集中！</div>`;
+        container.innerHTML = `<div class="sponsor-title">✨ SPONSORS ✨</div><div class="note-code">[ Add sponsors in JS array ]</div>`;
         return;
       }
-      let html = `<div class="sponsor-title">✨ SPONSOR ✨</div><div class="sponsor-flex">`;
+      let html = `<div class="sponsor-title">✨ SPONSORS ✨</div><div class="sponsor-flex">`;
       sponsors.forEach(sp => {
         html += `<div class="sponsor-item"><a href="${sp.linkUrl}" target="_blank" rel="sponsored"><img src="${sp.imageUrl}" alt="${sp.alt}" loading="lazy"></a></div>`;
       });
@@ -353,6 +350,15 @@
     };
     renderBlock(topSponsorDiv);
     renderBlock(bottomSponsorDiv);
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
   }
 
   function renderServiceList() {
@@ -365,7 +371,7 @@
       card.className = 'card';
       card.setAttribute('data-id', service.id);
       card.innerHTML = `
-        <img class="card-img" src="${service.imageUrl}" alt="${name}" loading="lazy">
+        <img class="card-img" src="${service.imageUrl}" alt="${escapeHtml(name)}" loading="lazy">
         <div class="card-content">
           <div class="card-title">${escapeHtml(name)}</div>
           <div class="card-desc">${escapeHtml(desc.substring(0, 80))}${desc.length > 80 ? '…' : ''}</div>
@@ -373,15 +379,6 @@
       `;
       card.addEventListener('click', () => showDetail(service.id));
       serviceListDiv.appendChild(card);
-    });
-  }
-
-  function escapeHtml(str) {
-    return str.replace(/[&<>]/g, function(m) {
-      if (m === '&') return '&amp;';
-      if (m === '<') return '&lt;';
-      if (m === '>') return '&gt;';
-      return m;
     });
   }
 
@@ -414,7 +411,9 @@
     const lang = currentLang;
     langBtn.innerText = lang === 'en' ? '日本語' : 'English';
     const h1 = document.querySelector('h1');
-    if (h1) h1.innerText = lang === 'en' ? h1.getAttribute('data-en') : h1.getAttribute('data-ja');
+    if (h1) {
+      h1.innerText = lang === 'en' ? h1.getAttribute('data-en') : h1.getAttribute('data-ja');
+    }
     const backSpan = backBtn.querySelector('span');
     if (backSpan) backSpan.innerText = lang === 'en' ? 'Back' : '戻る';
     const linkSpan = detailLink.querySelector('span');
@@ -429,6 +428,7 @@
     }
     document.querySelectorAll('[data-en][data-ja]').forEach(el => {
       if (!el.classList || !el.classList.contains('hidden')) {
+        if (el.tagName === 'H1') return; // already handled
         el.innerText = lang === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-ja');
       }
     });
@@ -467,6 +467,19 @@
 
   function toggleLanguage() {
     setLanguage(currentLang === 'en' ? 'ja' : 'en');
+  }
+
+  // --------------------------------------------------------------
+  // Service Worker 登録 + オフライン対応
+  // --------------------------------------------------------------
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        console.log('SW registered:', reg);
+      }).catch(err => {
+        console.log('SW registration failed:', err);
+      });
+    });
   }
 
   // --------------------------------------------------------------
